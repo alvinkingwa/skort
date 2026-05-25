@@ -1,23 +1,24 @@
 // ─────────────────────────────────────────────
-//  src/hooks/useModels.ts
-//  Contains both:
-//  - useModels() — fetch list of models
-//  - useModel(id) — fetch single model detail
+//  src/hooks/useBnbs.ts
+//  Contains both hooks:
+//  - useBnbs() — fetch list of BnBs
+//  - useBnb(id) — fetch single BnB detail
 // ─────────────────────────────────────────────
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchModels, fetchModelById, FetchModelsParams, Model, ModelDetail } from "../api/modelsApi";
+import { fetchBnbs, fetchBnbById, FetchBnbsParams, Bnb, BnbDetail } from "../api/bnbsApi";
 
-// ── useModels — list ──────────────────────────
-interface UseModelsResult {
-  models: Model[];
+
+// ── useBnbs — list ────────────────────────────
+interface UseBnbsResult {
+  bnbs: Bnb[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
 }
 
-export function useModels(filters: FetchModelsParams = {}): UseModelsResult {
-  const [models, setModels] = useState<Model[]>([]);
+export function useBnbs(filters: FetchBnbsParams = {}): UseBnbsResult {
+  const [bnbs, setBnbs] = useState<Bnb[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,8 +28,8 @@ export function useModels(filters: FetchModelsParams = {}): UseModelsResult {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchModels(JSON.parse(filterKey) as FetchModelsParams);
-      setModels(data);
+      const data = await fetchBnbs(JSON.parse(filterKey) as FetchBnbsParams);
+      setBnbs(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -40,29 +41,29 @@ export function useModels(filters: FetchModelsParams = {}): UseModelsResult {
     load();
   }, [load]);
 
-  return { models, loading, error, refetch: load };
+  return { bnbs, loading, error, refetch: load };
 }
 
-// ── useModel — single detail ──────────────────
-interface UseModelResult {
-  model: ModelDetail | null;
+// ── useBnb — single detail ────────────────────
+interface UseBnbResult {
+  bnb: BnbDetail | null;
   loading: boolean;
   error: string | null;
 }
 
-export function useModel(id: number): UseModelResult {
-  const [model, setModel]     = useState<ModelDetail | null>(null);
+export function useBnb(id: number): UseBnbResult {
+  const [bnb, setBnb]         = useState<BnbDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError]     = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchModelById(id)
-      .then(setModel)
+    fetchBnbById(id)
+      .then(setBnb)
       .catch((err) => setError(err instanceof Error ? err.message : "Something went wrong"))
       .finally(() => setLoading(false));
   }, [id]);
 
-  return { model, loading, error };
+  return { bnb, loading, error };
 }
